@@ -76,6 +76,27 @@ Open http://localhost:5173 and start chatting.
 | `CWD` | Working directory Claude operates in | `process.cwd()` |
 | `PORT` | WebSocket server port | `3001` |
 
+## MCP servers
+
+MCP servers you've installed for Claude Code are automatically available. The server loads configs from these locations (first match wins per server name):
+
+1. `server/mcp-servers.json` — app-specific config
+2. `<CWD>/.claude/settings.json` — project-level Claude Code settings
+3. `~/.claude/settings.json` — user-level Claude Code settings
+
+To add servers just for this app, create `server/mcp-servers.json`:
+
+```json
+{
+  "playwright": {
+    "command": "npx",
+    "args": ["@playwright/mcp@latest"]
+  }
+}
+```
+
+Or just configure them in your normal Claude Code settings and they'll be picked up automatically.
+
 ## How it works
 
 The server uses the [Claude Agent SDK](https://www.npmjs.com/package/@anthropic-ai/claude-agent-sdk) in **streaming input mode** — it spawns a Claude Code subprocess and bridges messages between the browser (WebSocket) and the agent (async generator). Permission mode is set to `bypassPermissions`, so Claude can use all tools without approval prompts.

@@ -4,9 +4,11 @@ import { createServer } from "http";
 import { WebSocketServer, WebSocket } from "ws";
 import { ClaudeSession } from "./session.js";
 import type { ClientMessage } from "./protocol.js";
+import { loadMcpServers } from "./mcp.js";
 
 const PORT = Number(process.env.PORT ?? 3001);
 const CWD = process.env.CWD ?? process.cwd();
+const mcpServers = loadMcpServers(CWD);
 
 const app = express();
 app.get("/health", (_req, res) => res.json({ status: "ok" }));
@@ -27,7 +29,7 @@ wss.on("connection", (ws: WebSocket) => {
     }
   };
 
-  const session = new ClaudeSession(send, CWD);
+  const session = new ClaudeSession(send, CWD, mcpServers);
   sessions.set(id, session);
 
   // Start the agent session (runs in background)
@@ -69,4 +71,8 @@ wss.on("connection", (ws: WebSocket) => {
 server.listen(PORT, () => {
   console.log(`Server listening on :${PORT}`);
   console.log(`Working directory: ${CWD}`);
+  const mcpNames = Object.keys(mcpServers);
+  if (mcpNames.length > 0) {
+    console.log(`MCP servers: ${mcpNames.join(", ")}`);
+  }
 });

@@ -25,6 +25,7 @@ export class ClaudeSession {
   constructor(
     private send: MessageSender,
     private cwd: string,
+    private mcpServers: Record<string, unknown> = {},
   ) {}
 
   async start(): Promise<void> {
@@ -38,6 +39,10 @@ export class ClaudeSession {
         permissionMode: "bypassPermissions",
         allowDangerouslySkipPermissions: true,
         includePartialMessages: true,
+        settingSources: ["user", "project", "local"],
+        ...(Object.keys(this.mcpServers).length > 0 && {
+          mcpServers: this.mcpServers as Record<string, never>,
+        }),
       },
     });
 
